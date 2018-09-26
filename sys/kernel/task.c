@@ -270,7 +270,13 @@ int32_t hf_spawn(void (*task)(), uint16_t period, uint16_t capacity, uint16_t de
 		if (period){
 			if (hf_queue_addtail(krnl_rt_queue, krnl_task)) panic(PANIC_CANT_PLACE_RT);
 		}else{
-			if (hf_queue_addtail(krnl_run_queue, krnl_task)) panic(PANIC_CANT_PLACE_RUN);
+			if (capacity) {
+				//GOL
+				//TODO
+
+			} else {
+				if (hf_queue_addtail(krnl_run_queue, krnl_task)) panic(PANIC_CANT_PLACE_RUN);
+			}
 		}
 	}else{
 		krnl_task->ptask = 0;
@@ -461,13 +467,18 @@ int32_t hf_kill(uint16_t id)
 			if (hf_queue_swap(krnl_rt_queue, j, j-1)) panic(PANIC_CANT_SWAP);
 		krnl_task2 = hf_queue_remhead(krnl_rt_queue);
 	}else{
-		k = hf_queue_count(krnl_run_queue);
-		for (i = 0; i < k; i++)
-			if (hf_queue_get(krnl_run_queue, i) == krnl_task) break;
-		if (!k || i == k) panic(PANIC_NO_TASKS_RUN);
-		for (j = i; j > 0; j--)
-			if (hf_queue_swap(krnl_run_queue, j, j-1)) panic(PANIC_CANT_SWAP);
-		krnl_task2 = hf_queue_remhead(krnl_run_queue);
+		if (capacity) {
+			//GOL
+			//TODO
+		} else {
+			k = hf_queue_count(krnl_run_queue);
+			for (i = 0; i < k; i++)
+				if (hf_queue_get(krnl_run_queue, i) == krnl_task) break;
+			if (!k || i == k) panic(PANIC_NO_TASKS_RUN);
+			for (j = i; j > 0; j--)
+				if (hf_queue_swap(krnl_run_queue, j, j-1)) panic(PANIC_CANT_SWAP);
+			krnl_task2 = hf_queue_remhead(krnl_run_queue);
+		}
 	}
 	if (!krnl_task2 || krnl_task2 != krnl_task) panic(PANIC_UNKNOWN_TASK_STATE);
 	

@@ -77,6 +77,7 @@ static void clear_pcb(void)
 	/* setup callbacks for the schedulers */
 	krnl_pcb.sched_rt = sched_rma;
 	krnl_pcb.sched_be = sched_priorityrr;
+	krnl_pcb.sched_ap = sched_apr;
 	/* and clear the process control block */
 	krnl_pcb.coop_cswitch = 0;
 	krnl_pcb.preempt_cswitch = 0;
@@ -92,6 +93,9 @@ static void init_queues(void)
 	if (krnl_delay_queue == NULL) panic(PANIC_OOM);
 	krnl_rt_queue = hf_queue_create(MAX_TASKS);
 	if (krnl_rt_queue == NULL) panic(PANIC_OOM);
+
+	krnl_periodic_tasks_queue = hf_queue_create(MAX_TASKS);
+	if (krnl_periodic_tasks_queue == NULL) panic(PANIC_OOM);
 }
 
 static void idletask(void)

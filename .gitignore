@@ -1,1 +1,4 @@
 *.sw?
+*.o
+image.*
+usr/sim/hf_risc_sim/hf_risc_sim

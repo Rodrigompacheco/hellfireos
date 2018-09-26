@@ -51,6 +51,7 @@ struct tcb_entry {
 struct pcb_entry {
 	int32_t (*sched_rt)();				/*!< pointer to the realtime scheduler */
 	int32_t (*sched_be)();				/*!< pointer to the best effort scheduler */
+	int32_t (*sched_ap)();				/*!< pointer to the aperiodic scheduler */
 	uint32_t coop_cswitch;				/*!< cooperative context switches */
 	uint32_t preempt_cswitch;			/*!< preeptive context switches */
 	uint32_t interrupts;				/*!< number of non-masked interrupts */
@@ -74,3 +75,6 @@ struct queue *krnl_rt_queue;				/*!< pointer to a queue of real time tasks */
 struct queue *krnl_event_queue;				/*!< pointer to a queue of tasks waiting for an event */
 uint8_t krnl_heap[HEAP_SIZE];				/*!< contiguous heap memory area to be used as a memory pool. the memory allocator (malloc() and free()) controls this data structure */
 uint32_t krnl_free;					/*!< amount of free heap memory, in bytes */
+
+
+struct queue *krnl_periodic_tasks_queue;				/*!< pointer to a queue of tasks to be executed periodically */
