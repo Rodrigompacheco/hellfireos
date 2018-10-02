@@ -77,4 +77,4 @@ uint8_t krnl_heap[HEAP_SIZE];				/*!< contiguous heap memory area to be used as 
 uint32_t krnl_free;					/*!< amount of free heap memory, in bytes */
 
 
-struct queue *krnl_periodic_tasks_queue;				/*!< pointer to a queue of tasks to be executed periodically */
+struct queue *krnl_aperiodic_tasks_queue;				/*!< pointer to a queue of tasks to be executed periodically */

@@ -36,7 +36,13 @@ static void process_delay_queue(void)
 			if (krnl_task2->period){
 				if (hf_queue_addtail(krnl_rt_queue, krnl_task2)) panic(PANIC_CANT_PLACE_RT);
 			}else{
-				if (hf_queue_addtail(krnl_run_queue, krnl_task2)) panic(PANIC_CANT_PLACE_RUN);
+				if (krnl_task2->capacity) {
+					//GOL
+					if (hf_queue_addtail(krnl_aperiodic_tasks_queue, krnl_task2)) panic(PANIC_CANT_PLACE_RUN);
+
+				} else {
+					if (hf_queue_addtail(krnl_run_queue, krnl_task2)) panic(PANIC_CANT_PLACE_RUN);
+				}
 			}
 		}else{
 			if (hf_queue_addtail(krnl_delay_queue, krnl_task2)) panic(PANIC_CANT_PLACE_DELAY);
@@ -59,6 +65,15 @@ static void rt_queue_next()
 	if (!krnl_task)
 		panic(PANIC_NO_TASKS_RT);
 	if (hf_queue_addtail(krnl_rt_queue, krnl_task))
+		panic(PANIC_CANT_PLACE_RT);
+}
+
+static void apr_queue_next()
+{
+	krnl_task = hf_queue_remhead(krnl_aperiodic_tasks_queue);
+	if (!krnl_task)
+		panic(PANIC_NO_TASKS_RT);
+	if (hf_queue_addtail(krnl_aperiodic_tasks_queue, krnl_task))
 		panic(PANIC_CANT_PLACE_RT);
 }
 
@@ -298,22 +313,12 @@ int32_t sched_apr(void)
 	uint16_t id = 0;
 	struct tcb_entry *e1, *e2;
 	
-	k = hf_queue_count(krnl_rt_queue);
+	k = hf_queue_count(krnl_aperiodic_tasks_queue);
 	if (k == 0)
 		return 0;
 		
-	for (i = 0; i < k-1; i++){
-		for (j = i + 1; j < k; j++){
-			e1 = hf_queue_get(krnl_rt_queue, i);
-			e2 = hf_queue_get(krnl_rt_queue, j);
-			if (e1->period > e2->period)
-				if (hf_queue_swap(krnl_rt_queue, i, j))
-					panic(PANIC_CANT_SWAP);
-		}
-	}
-
 	for (i = 0; i < k; i++){
-		rt_queue_next();
+		apt_queue_next();
 		if (krnl_task->state != TASK_BLOCKED && krnl_task->capacity_rem > 0 && !id){
 			id = krnl_task->id;
 			--krnl_task->capacity_rem;
